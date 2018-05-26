@@ -26,4 +26,11 @@ Task("Build")
         .WithTarget("Build"));    
 });
 
+Task("Test")
+    .IsDependentOn("Restore")
+    .Does(() =>
+{
+    Information("Testing the code");
+});
+
 RunTarget(target);
