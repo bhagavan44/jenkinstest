@@ -14,10 +14,11 @@ pipeline{
             }
         }
 
-        stage('build'){
+         stage('build'){
             steps{
-                println "$WORKSPACE"
-                //powershell(returnStdout: true, script: "${WORKSPACE}")
+                def scriptPath = "$WORKSPACE\\build.ps1"
+                //powershell(returnStdout: true, script: "$scriptPath")
+                bat "powershell.exe -NonInteractive -ExecutionPolicy Bypass -Command \"& '.\\build.ps1'\""
             }
         }
     }
