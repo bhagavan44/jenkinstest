@@ -1,5 +1,6 @@
 pipeline{
     agent any
+    tim
     stages{
 
         stage('clean'){
@@ -16,7 +17,7 @@ pipeline{
 
         stage('build'){
             steps{
-                powershell returnStdout: true, script: 'build.ps1 --target=Build'
+                powershell returnStdout: true, script: '.\build.ps1 --target=Build'
             }
         }
     }
