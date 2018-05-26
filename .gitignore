@@ -1,2 +1,5 @@
 LogTool/.vs/
 obj/
+bin/
+LogTool/packages/
+tools/
