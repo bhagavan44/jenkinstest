@@ -16,7 +16,8 @@ pipeline{
 
         stage('build'){
             steps{
-                powershell(returnStdout: true, script: "${JOB_NAME}")
+                println "$WORKSPACE"
+                //powershell(returnStdout: true, script: "${WORKSPACE}")
             }
         }
     }
