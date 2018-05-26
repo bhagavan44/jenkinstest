@@ -1,6 +1,5 @@
 pipeline{
     agent any
-    tim
     stages{
 
         stage('clean'){
