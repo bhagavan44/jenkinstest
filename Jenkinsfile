@@ -16,8 +16,7 @@ pipeline{
 
         stage('build'){
             steps{
-                def status = powershell(returnStdout: true, script: 'build.ps1 --target=Build')
-                println status
+                powershell(returnStdout: true, script: 'build.ps1 --target=Build')
             }
         }
     }
