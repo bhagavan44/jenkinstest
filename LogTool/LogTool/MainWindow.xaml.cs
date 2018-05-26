@@ -26,7 +26,7 @@ namespace LogTool
         {
             InitializeComponent();
 
-           string message= JsonConvert.SerializeObject(new RequestModel());
+           string message= 1JsonConvert.SerializeObject(new RequestModel());
         }
     }
 }
