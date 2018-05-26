@@ -30,7 +30,7 @@ Task("Test")
     .IsDependentOn("Restore")
     .Does(() =>
 {
-    Information("Testing the code")
+    Information("Testing the code");
 });
 
 RunTarget(target);
