@@ -15,7 +15,9 @@ pipeline{
         }
 
         stage('build'){
-            powershell returnStdout: true, script: 'build.ps1 --target=Build'
+            steps{
+                powershell returnStdout: true, script: 'build.ps1 --target=Build'
+            }
         }
     }
 }
