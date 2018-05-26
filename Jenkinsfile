@@ -16,7 +16,7 @@ pipeline{
 
         stage('build'){
             steps{
-                powershell(returnStdout: true, script: '${WORKSPACE}/build.ps1 --target=Build')
+                powershell(returnStdout: true, script: '${WORKSPACE}\build.ps1 --target=Build')
             }
         }
     }
