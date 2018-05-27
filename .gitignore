@@ -3,3 +3,6 @@ obj/
 bin/
 LogTool/packages/
 tools/
+TestResults/
+coverage/
+*.zip

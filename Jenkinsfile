@@ -18,6 +18,11 @@ pipeline{
         }
 
          stage('build'){
+             when{
+                expression {
+                    return env.BRANCH_NAME != 'master' && env.BRANCH_NAME != 'develop';
+                }
+            }
             steps{
                   powershell '''
                   ."$PWD/build.ps1" --Target=Build --Configuration=Release
@@ -25,17 +30,31 @@ pipeline{
             }
         }
 
-        stage('test'){
+        stage('buil and test'){
             when{
                 expression {
                     return env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'develop';
                 }
             }
-            steps{
+            steps{                
                 powershell '''
-                  ."$PWD/build.ps1" --Target=Test --Configuration=Release
+                  ."$PWD/build.ps1" --Target=Coverage --Configuration=Release
                   '''
+                step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: true, keepLongStdio: true])                
             }
-        }
+            post {
+                success {
+                    publishHTML target: [
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: false,
+                        keepAll: true,
+                        reportDir: 'coverage',
+                        reportFiles: 'index.htm',            
+                        reportName: 'Code Coverage Report'
+                    ]
+                    deleteDir()
+                }
+            }
+        }        
     }
 }
