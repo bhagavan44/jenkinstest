@@ -53,7 +53,7 @@ Task("Test")
             }),
             Paths.CoverageFile,
             new OpenCoverSettings{
-                Register = "user"
+                Register = "Path64"
             }
             .WithFilter("+[*]*")
             .WithFilter("-[*.Tests*]*")
