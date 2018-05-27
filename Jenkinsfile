@@ -18,6 +18,11 @@ pipeline{
         }
 
          stage('build'){
+             when{
+                expression {
+                    return env.BRANCH_NAME != 'master' || env.BRANCH_NAME != 'develop';
+                }
+            }
             steps{
                   powershell '''
                   ."$PWD/build.ps1" --Target=Build --Configuration=Release
@@ -25,7 +30,7 @@ pipeline{
             }
         }
 
-        stage('test'){
+        stage('buil and test'){
             when{
                 expression {
                     return env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'develop';
