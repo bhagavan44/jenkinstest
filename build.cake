@@ -1,4 +1,5 @@
 #load "build/args.cake"
+#tool nuget:?package=vswhere&version=2.4.1
 
 Task("Clean")
     .Does(() =>
@@ -6,6 +7,7 @@ Task("Clean")
     Information("Clean directories");
     CleanDirectories("./LogTool/**/bin");
     CleanDirectories("./LogTool/**/obj");
+    CleanDirectories(Paths.TestResultFolder.ToString());
 });
 
 Task("Restore")
@@ -20,6 +22,7 @@ Task("Build")
     .IsDependentOn("Restore")
     .Does(() =>
 {
+    Information("Building the solution");
     MSBuild(
         Paths.SolutionFile,
         settings => settings.SetConfiguration(configuration)
@@ -27,10 +30,18 @@ Task("Build")
 });
 
 Task("Test")
-    .IsDependentOn("Restore")
+    .IsDependentOn("Build")
     .Does(() =>
 {
     Information("Testing the code");
+
+    VSTest("./**/bin/**/*.Tests.dll", 
+        new VSTestSettings() 
+        { 
+            InIsolation = true,
+            ToolPath = VSTestToolsPath(),
+            ArgumentCustomization = args => args.Append("/logger:trx;LogFileName=" + Paths.TestResultFile)
+        });
 });
 
 RunTarget(target);
