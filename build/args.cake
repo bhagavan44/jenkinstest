@@ -1,7 +1,13 @@
+#tool nuget:?package=vswhere&version=2.4.1
+
 var target = Argument("target", "Build");
 var configuration = Argument("configuration", "Release");
 var coverageReportPath = Argument<FilePath>("coverageReportPath", "coverage.zip");
-
+var sonarProject = Argument("sonarProject", "jenkinstest");
+var sonarKey = Argument("sonarKey", "");
+var sonarUrl = Argument("sonarUrl", "https://sonarcloud.io");
+var branch = Argument("branch", "master");
+var buildNumber = Argument("buildNumber", "1.0");
 
 public static class Paths
 {

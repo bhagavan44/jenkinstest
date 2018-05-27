@@ -1,7 +1,5 @@
 #load "build/args.cake"
-#tool nuget:?package=vswhere&version=2.4.1
-#tool nuget:?package=OpenCover
-#tool nuget:?package=ReportGenerator
+#load "build/test.cake"
 
 Task("Clean")
     .Does(() =>
@@ -33,53 +31,7 @@ Task("Build")
     MSBuild(
         Paths.SolutionFile,
         settings => settings.SetConfiguration(configuration)
-        .WithTarget("Build"));    
-});
-
-Task("Test")
-    .IsDependentOn("Build")
-    .Does(() =>
-{
-    Information("Testing the code");
-    EnsureDirectoryExists(Paths.TestResultFolder);
-
-    OpenCover(tool=>
-        tool.VSTest("./**/bin/**/*.Tests.dll", 
-            new VSTestSettings() 
-            { 
-                InIsolation = false,
-                ToolPath = VSTestToolsPath(),
-                ArgumentCustomization = args => args.Append("/logger:trx;LogFileName=" + Paths.TestResultFile)
-            }),
-            Paths.CoverageFile,
-            new OpenCoverSettings{
-                Register = "path32",
-                SkipAutoProps = true
-            }
-            .WithFilter("+[*]*")
-            .WithFilter("-[*.Tests*]*")
-            );
-});
-
-Task("Coverage")
-    .IsDependentOn("Test")
-    .Does(() =>
-{
-    Information("Generating the report");
-    
-    ReportGenerator(
-        Paths.CoverageFile,
-        Paths.CoverageReportDirectory,
-        new ReportGeneratorSettings
-        {
-            ReportTypes = new[] { ReportGeneratorReportType.Html }
-        }
-    );
-
-    Zip(
-        Paths.CoverageReportDirectory,
-        MakeAbsolute(coverageReportPath)
-    );
+        .WithTarget("ReBuild"));    
 });
 
 RunTarget(target);
