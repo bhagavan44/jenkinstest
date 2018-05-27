@@ -7,7 +7,6 @@ Task("SonarBegin")
   .IsDependentOn("Clean")
   .Does(() => {
 
-    Information($"Sonar Key: {sonarKey}");    
     SonarBegin(new SonarBeginSettings{
         Url = sonarUrl,
         Login = sonarKey,
@@ -15,7 +14,9 @@ Task("SonarBegin")
         Branch = branch,
         OpenCoverReportsPath = Paths.CoverageFile.ToString(),
         Version = buildNumber,
-        Key = sonarProject
+        Key = sonarProject,
+        ArgumentCustomization = args => args
+            .Append($"/o:{sonarOrganization}"),
      });
 });
 

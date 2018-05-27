@@ -8,6 +8,8 @@ var sonarKey = Argument("sonarKey", "");
 var sonarUrl = Argument("sonarUrl", "https://sonarcloud.io");
 var branch = Argument("branch", "master");
 var buildNumber = Argument("buildNumber", "1.0");
+var sonarOrganization = Argument("sonarOrganization", "bhagavan44-github");
+
 
 public static class Paths
 {
