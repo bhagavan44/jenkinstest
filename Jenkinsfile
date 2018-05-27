@@ -35,7 +35,7 @@ pipeline{
                 powershell '''
                   ."$PWD/build.ps1" --Target=Test --Configuration=Release
                   '''
-                mstest testResultsFile:"**/*.trx", keepLongStdio: true
+                step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: true, keepLongStdio: true])
             }
         }
     }
