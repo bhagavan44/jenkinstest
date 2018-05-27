@@ -49,7 +49,7 @@ pipeline{
                         alwaysLinkToLastBuild: false,
                         keepAll: true,
                         reportDir: 'coverage',
-                        reportFiles: 'index.html',            
+                        reportFiles: 'index.htm',            
                         reportName: 'Code Coverage Report'
                     ]
                 }

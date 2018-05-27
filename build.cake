@@ -52,9 +52,11 @@ Task("Test")
                 ArgumentCustomization = args => args.Append("/logger:trx;LogFileName=" + Paths.TestResultFile)
             }),
             Paths.CoverageFile,
-            new OpenCoverSettings()
-                .WithFilter("+[*]*")
-                .WithFilter("-[*.Tests*]*")
+            new OpenCoverSettings{
+                Register = "user"
+            }
+            .WithFilter("+[*]*")
+            .WithFilter("-[*.Tests*]*")
             );
 });
 
