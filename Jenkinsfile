@@ -52,6 +52,7 @@ pipeline{
                         reportFiles: 'index.htm',            
                         reportName: 'Code Coverage Report'
                     ]
+                    deleteDir()
                 }
             }
         }        
