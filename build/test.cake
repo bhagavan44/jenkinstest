@@ -6,7 +6,9 @@
 Task("SonarBegin")
   .IsDependentOn("Clean")
   .Does(() => {
-     SonarBegin(new SonarBeginSettings{
+
+    Information($"Sonar Key: {sonaryKey}");    
+    SonarBegin(new SonarBeginSettings{
         Url = sonarUrl,
         Login = sonarKey,
         Verbose = true,
