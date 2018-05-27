@@ -36,9 +36,9 @@ pipeline{
                     return env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'develop';
                 }
             }
-            steps{
+            steps{                
                 powershell '''
-                  ."$PWD/build.ps1" --Target=Test --Configuration=Release
+                  ."$PWD/build.ps1" --Target=Coverage --Configuration=Release
                   '''
                 step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: true, keepLongStdio: true])                
             }

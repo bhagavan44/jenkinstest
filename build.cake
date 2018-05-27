@@ -41,6 +41,7 @@ Task("Test")
     .Does(() =>
 {
     Information("Testing the code");
+    EnsureDirectoryExists(Paths.TestResultFolder);
 
     OpenCover(tool=>
         tool.VSTest("./**/bin/**/*.Tests.dll", 
