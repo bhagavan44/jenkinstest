@@ -40,8 +40,20 @@ pipeline{
                 powershell '''
                   ."$PWD/build.ps1" --Target=Test --Configuration=Release
                   '''
-                step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: true, keepLongStdio: true])
+                step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: true, keepLongStdio: true])                
             }
-        }
+            post {
+                success {
+                    publishHTML target: [
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: false,
+                        keepAll: true,
+                        reportDir: 'coverage',
+                        reportFiles: 'index.html',            
+                        reportName: 'Code Coverage Report'
+                    ]
+                }
+            }
+        }        
     }
 }

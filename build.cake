@@ -1,13 +1,20 @@
 #load "build/args.cake"
 #tool nuget:?package=vswhere&version=2.4.1
+#tool nuget:?package=OpenCover
+#tool nuget:?package=ReportGenerator
 
 Task("Clean")
     .Does(() =>
 {
-    Information("Clean directories");
+    Information("Clean directories and files");
     CleanDirectories("./LogTool/**/bin");
     CleanDirectories("./LogTool/**/obj");
     CleanDirectories(Paths.TestResultFolder.ToString());
+    CleanDirectories(Paths.CoverageReportDirectory.ToString());
+    if (FileExists(coverageReportPath))
+    {
+        DeleteFile(coverageReportPath);
+    }
 });
 
 Task("Restore")
@@ -35,13 +42,40 @@ Task("Test")
 {
     Information("Testing the code");
 
-    VSTest("./**/bin/**/*.Tests.dll", 
-        new VSTestSettings() 
-        { 
-            InIsolation = true,
-            ToolPath = VSTestToolsPath(),
-            ArgumentCustomization = args => args.Append("/logger:trx;LogFileName=" + Paths.TestResultFile)
-        });
+    OpenCover(tool=>
+        tool.VSTest("./**/bin/**/*.Tests.dll", 
+            new VSTestSettings() 
+            { 
+                InIsolation = false,
+                ToolPath = VSTestToolsPath(),
+                ArgumentCustomization = args => args.Append("/logger:trx;LogFileName=" + Paths.TestResultFile)
+            }),
+            Paths.CoverageFile,
+            new OpenCoverSettings()
+                .WithFilter("+[*]*")
+                .WithFilter("-[*.Tests*]*")
+            );
+});
+
+Task("Coverage")
+    .IsDependentOn("Test")
+    .Does(() =>
+{
+    Information("Generating the report");
+    
+    ReportGenerator(
+        Paths.CoverageFile,
+        Paths.CoverageReportDirectory,
+        new ReportGeneratorSettings
+        {
+            ReportTypes = new[] { ReportGeneratorReportType.Html }
+        }
+    );
+
+    Zip(
+        Paths.CoverageReportDirectory,
+        MakeAbsolute(coverageReportPath)
+    );
 });
 
 RunTarget(target);

@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace LogTool.Tests
 {
@@ -9,7 +8,7 @@ namespace LogTool.Tests
         [TestMethod]
         public void BasicTest()
         {
-            int i= 0;
+            int i = 0;
             Assert.AreEqual(0, i);
         }
     }
