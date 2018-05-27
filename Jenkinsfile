@@ -20,8 +20,8 @@ pipeline{
             }
         }
 
-         stage('build'){
-             when{
+        stage('build'){
+            when{
                 expression {
                     return env.BRANCH_NAME != 'master' && env.BRANCH_NAME != 'develop';
                 }
@@ -42,11 +42,10 @@ pipeline{
             steps{
                 withCredentials([string(credentialsId: 'sonarId', variable: 'SonarKey')]) {
                     powershell '''
-                    ."$PWD/build.ps1" --Target=Sonar --Configuration=Release --buildNumber=$BUILD_DISPLAY_NAME --branch=$env.BRANCH_NAME --sonarKey=$SonarKey
+                    ."$PWD/build.ps1" --Target=Sonar --Configuration=Release --buildNumber=$env:BUILD_NUMBER --branch=$env:BRANCH_NAME --sonarKey="{SonarKey}"
                     '''
                     step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: true, keepLongStdio: true])
                 }
-
             }
             post {
                 success {

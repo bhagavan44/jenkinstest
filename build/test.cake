@@ -4,6 +4,7 @@
 #tool nuget:?package=ReportGenerator
  
 Task("SonarBegin")
+  .IsDependentOn("Clean")
   .Does(() => {
      SonarBegin(new SonarBeginSettings{
         Url = sonarUrl,
@@ -11,7 +12,8 @@ Task("SonarBegin")
         Verbose = true,
         Branch = branch,
         OpenCoverReportsPath = Paths.CoverageFile.ToString(),
-        Version = buildNumber
+        Version = buildNumber,
+        Key = sonarProject
      });
 });
 
