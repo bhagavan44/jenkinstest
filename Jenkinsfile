@@ -42,7 +42,7 @@ pipeline{
             steps{
                 withCredentials([string(credentialsId: 'sonarId', variable: 'SonarKey')]) {
                     powershell '''
-                    ."$PWD/build.ps1" --Target=Sonar --Configuration=Release --buildNumber=$env:BUILD_DISPLAYNAME --branch=$env:BRANCH_NAME --sonarKey=$env:SonarKey
+                    ."$PWD/build.ps1" --Target=Sonar --Configuration=Release --buildNumber=$env:BUILD_DISPLAY_NAME --branch=$env:BRANCH_NAME --sonarKey=$env:SonarKey
                     '''
                     step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: true, keepLongStdio: true])
                 }
