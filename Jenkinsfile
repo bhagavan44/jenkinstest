@@ -3,6 +3,9 @@ pipeline{
     options {
         skipDefaultCheckout true
     }
+    triggers { 
+        pollSCM('H */4 * * 1-5') 
+    }
     stages{
 
         stage('clean'){
@@ -17,8 +20,8 @@ pipeline{
             }
         }
 
-         stage('build'){
-             when{
+        stage('build'){
+            when{
                 expression {
                     return env.BRANCH_NAME != 'master' && env.BRANCH_NAME != 'develop';
                 }
@@ -36,11 +39,13 @@ pipeline{
                     return env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'develop';
                 }
             }
-            steps{                
-                powershell '''
-                  ."$PWD/build.ps1" --Target=Coverage --Configuration=Release
-                  '''
-                step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: true, keepLongStdio: true])                
+            steps{
+                withCredentials([string(credentialsId: 'sonarId', variable: 'SonarKey')]) {
+                    powershell '''
+                    ."$PWD/build.ps1" --Target=Sonar --Configuration=Release --buildNumber=$env:BUILD_DISPLAY_NAME --branch=$env:BRANCH_NAME --sonarKey=$env:SonarKey
+                    '''
+                    step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: true, keepLongStdio: true])
+                }
             }
             post {
                 success {
@@ -55,6 +60,6 @@ pipeline{
                     deleteDir()
                 }
             }
-        }        
+        }
     }
 }
