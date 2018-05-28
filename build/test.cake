@@ -1,7 +1,7 @@
-#tool nuget:?package=MSBuild.SonarQube.Runner.Tool
-#addin nuget:?package=Cake.Sonar
-#tool nuget:?package=OpenCover
-#tool nuget:?package=ReportGenerator
+#tool nuget:?package=MSBuild.SonarQube.Runner.Tool&version=4.2.0
+#addin nuget:?package=Cake.Sonar&version=1.1.0
+#tool nuget:?package=OpenCover&version=4.6.519
+#tool nuget:?package=ReportGenerator&version=3.1.2
  
 Task("SonarBegin")
   .IsDependentOn("Clean")
@@ -13,7 +13,7 @@ Task("SonarBegin")
         Verbose = true,
         Branch = branch,
         OpenCoverReportsPath = Paths.CoverageFile.ToString(),
-        Version = buildNumber,
+        Version = packageVersion,
         Key = sonarProject,
         ArgumentCustomization = args => args
             .Append($"/o:{sonarOrganization}"),
@@ -74,6 +74,7 @@ Task("SonarEnd")
 });
 
 Task("Sonar")
-  .IsDependentOn("SonarBegin")
-  .IsDependentOn("Coverage")
-  .IsDependentOn("SonarEnd");
+    .IsDependentOn("Version")
+    .IsDependentOn("SonarBegin")
+    .IsDependentOn("Coverage")
+    .IsDependentOn("SonarEnd");
