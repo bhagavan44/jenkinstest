@@ -21,6 +21,7 @@ Task("SonarBegin")
 });
 
 Task("Test")
+    .WithCriteria(()=> BuildSystem.IsRunningOnJenkins)
     .IsDependentOn("Build")
     .Does(() =>
 {
@@ -45,7 +46,27 @@ Task("Test")
             );
 });
 
+Task("VSTest")
+    .WithCriteria(()=> BuildSystem.IsRunningOnVSTS)
+    .IsDependentOn("Build")
+    .Does(() =>
+{
+    Information("Testing the code");
+    EnsureDirectoryExists(Paths.TestResultFolder);
+
+    VSTest("./**/bin/**/*.Tests.dll", 
+        new VSTestSettings() 
+        { 
+            InIsolation = true,
+            ToolPath = VSTestToolsPath(),
+            EnableCodeCoverage = true,
+            ArgumentCustomization = args => args.Append("/logger:trx;LogFileName=" + Paths.TestResultFile)
+        });
+
+});
+
 Task("Coverage")
+    .WithCriteria(()=> BuildSystem.IsRunningOnJenkins)
     .IsDependentOn("Test")
     .Does(() =>
 {
