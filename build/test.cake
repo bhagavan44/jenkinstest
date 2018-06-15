@@ -15,7 +15,7 @@ Task("SonarBegin")
         OpenCoverReportsPath = Paths.CoverageFile.ToString(),
         Version = packageVersion,
         Key = sonarProject,
-        VsTestReportsPath = Paths.TestResultFile,
+        VsTestReportsPath = Paths.TestResultFile.ToString(),
         ArgumentCustomization = args => args
             .Append($"/o:{sonarOrganization}"),
      });
