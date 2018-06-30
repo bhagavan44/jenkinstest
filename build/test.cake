@@ -96,14 +96,19 @@ Task("TeamCityTest")
     Information("Testing the code");
     EnsureDirectoryExists(Paths.TestResultFolder);
 
-    VSTest("./**/bin/**/*.Tests.dll", 
-        new VSTestSettings() 
-        { 
-            InIsolation = true,
-            ToolPath = VSTestToolsPath(),
-            EnableCodeCoverage = true,
-            ArgumentCustomization = args => args.Append("/logger:trx;LogFileName=" + Paths.TestResultFile)
-        });
+    DotCoverAnalyse(tool => {
+        tool.VSTest("./**/bin/**/*.Tests.dll", 
+            new VSTestSettings() 
+            { 
+                InIsolation = true,
+                ToolPath = VSTestToolsPath(),
+                EnableCodeCoverage = true,
+                ArgumentCustomization = args => args.Append("/logger:trx;LogFileName=" + Paths.TestResultFile)
+            });},
+        new FilePath("./result.xml"),
+        new DotCoverAnalyseSettings()
+            .WithFilter("+:LogTool")
+            .WithFilter("-:LogTool.Tests"));
 });
 
 Task("SonarEnd")
