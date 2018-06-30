@@ -21,7 +21,7 @@ Task("SonarBegin")
      });
 });
 
-Task("Test")
+Task("JenkinsTest")
     .WithCriteria(()=> BuildSystem.IsRunningOnJenkins)
     .IsDependentOn("Build")
     .Does(() =>
@@ -88,12 +88,35 @@ Task("Coverage")
     );
 });
 
+Task("TeamCityTest")
+    .WithCriteria(()=> BuildSystem.IsRunningOnTeamCity)
+    .IsDependentOn("Build")
+    .Does(() =>
+{
+    Information("Testing the code");
+    EnsureDirectoryExists(Paths.TestResultFolder);
+
+    VSTest("./**/bin/**/*.Tests.dll", 
+        new VSTestSettings() 
+        { 
+            InIsolation = true,
+            ToolPath = VSTestToolsPath(),
+            EnableCodeCoverage = true,
+            ArgumentCustomization = args => args.Append("/logger:trx;LogFileName=" + Paths.TestResultFile)
+        });
+});
+
 Task("SonarEnd")
   .Does(() => {
      SonarEnd(new SonarEndSettings{
         Login = sonarKey,
      });
 });
+
+Task("Test")
+    .IsDependentOn("JenkinsTest")
+    .IsDependentOn("VSTest")
+    .IsDependentOn("TeamCityTest");
 
 Task("Sonar")
     .IsDependentOn("Version")
