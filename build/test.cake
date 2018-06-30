@@ -2,6 +2,7 @@
 #addin nuget:?package=Cake.Sonar&version=1.1.0
 #tool nuget:?package=OpenCover&version=4.6.519
 #tool nuget:?package=ReportGenerator&version=3.1.2
+#tool nuget:?package=JetBrains.dotCover.CommandLineTools
  
 Task("SonarBegin")
   .IsDependentOn("Clean")
