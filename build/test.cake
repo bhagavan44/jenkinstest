@@ -105,10 +105,12 @@ Task("TeamCityTest")
                 EnableCodeCoverage = true,
                 ArgumentCustomization = args => args.Append("/logger:trx;LogFileName=" + Paths.TestResultFile)
             });},
-        new FilePath("./result.xml"),
+        Paths.CoverageFile,
         new DotCoverAnalyseSettings()
             .WithFilter("+:LogTool")
             .WithFilter("-:LogTool.Tests"));
+
+    TeamCity.ImportDotCoverCoverage(Paths.CoverageFile);
 });
 
 Task("SonarEnd")
