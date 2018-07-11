@@ -27,24 +27,22 @@ pipeline{
                 }
             }
             steps{
-                  powershell '''
-                  ."$PWD/build.ps1" --Target=Build --Configuration=Release
-                  '''
+                callPowerShell('--Target=Build --Configuration=Release')
             }
         }
 
-        stage('buil and test'){
+        stage('build and test'){
             when{
                 expression {
                     return env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'develop';
                 }
             }
             steps{
-                withCredentials([string(credentialsId: 'sonarId', variable: 'SonarKey')]) {
-                    powershell '''
-                    ."$PWD/build.ps1" --Target=Sonar --Configuration=Release --branch=$env:BRANCH_NAME --sonarKey=$env:SonarKey
-                    '''
-                    step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: true, keepLongStdio: true])
+                withSonarQubeEnv('SonarCloud') {
+                    withCredentials([string(credentialsId: 'sonarId', variable: 'SonarKey')]) {
+                        callPowerShell('--Target=Sonar --Configuration=Release --branch=$env:BRANCH_NAME --sonarKey=$env:SonarKey')
+                        step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: true, keepLongStdio: true])
+                    }
                 }
             }
             post {
@@ -61,5 +59,17 @@ pipeline{
                 }
             }
         }
+
+        stage('Quality Gate'){
+            steps{
+                timeout(5) {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
     }
+}
+
+def callPowerShell(String arguments){
+    powershell $'"$PWD/build.ps1" ${arguments}'
 }

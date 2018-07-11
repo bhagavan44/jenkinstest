@@ -2,6 +2,7 @@
 #addin nuget:?package=Cake.Sonar&version=1.1.0
 #tool nuget:?package=OpenCover&version=4.6.519
 #tool nuget:?package=ReportGenerator&version=3.1.2
+#tool nuget:?package=JetBrains.dotCover.CommandLineTools
  
 Task("SonarBegin")
   .IsDependentOn("Clean")
@@ -15,12 +16,14 @@ Task("SonarBegin")
         OpenCoverReportsPath = Paths.CoverageFile.ToString(),
         Version = packageVersion,
         Key = sonarProject,
+        VsTestReportsPath = Paths.TestResultFolder.ToString() + "//" + Paths.TestResultFile.ToString(),
         ArgumentCustomization = args => args
             .Append($"/o:{sonarOrganization}"),
      });
 });
 
-Task("Test")
+Task("JenkinsTest")
+    .WithCriteria(()=> BuildSystem.IsRunningOnJenkins)
     .IsDependentOn("Build")
     .Does(() =>
 {
@@ -45,7 +48,27 @@ Task("Test")
             );
 });
 
+Task("VSTest")
+    .WithCriteria(()=> BuildSystem.IsRunningOnVSTS)
+    .IsDependentOn("Build")
+    .Does(() =>
+{
+    Information("Testing the code");
+    EnsureDirectoryExists(Paths.TestResultFolder);
+
+    VSTest("./**/bin/**/*.Tests.dll", 
+        new VSTestSettings() 
+        { 
+            InIsolation = true,
+            ToolPath = VSTestToolsPath(),
+            EnableCodeCoverage = true,
+            ArgumentCustomization = args => args.Append("/logger:trx;LogFileName=" + Paths.TestResultFile)
+        });
+
+});
+
 Task("Coverage")
+    .WithCriteria(()=> BuildSystem.IsRunningOnJenkins)
     .IsDependentOn("Test")
     .Does(() =>
 {
@@ -66,12 +89,42 @@ Task("Coverage")
     );
 });
 
+Task("TeamCityTest")
+    .WithCriteria(()=> BuildSystem.IsRunningOnTeamCity)
+    .IsDependentOn("Build")
+    .Does(() =>
+{
+    Information("Testing the code");
+    EnsureDirectoryExists(Paths.TestResultFolder);
+
+    DotCoverAnalyse(tool => {
+        tool.VSTest("./**/bin/**/*.Tests.dll", 
+            new VSTestSettings() 
+            { 
+                InIsolation = true,
+                ToolPath = VSTestToolsPath(),
+                EnableCodeCoverage = true,
+                ArgumentCustomization = args => args.Append("/logger:trx;LogFileName=" + Paths.TestResultFile)
+            });},
+        Paths.CoverageFile,
+        new DotCoverAnalyseSettings()
+            .WithFilter("+:LogTool")
+            .WithFilter("-:LogTool.Tests"));
+
+    TeamCity.ImportDotCoverCoverage(Paths.CoverageFile);
+});
+
 Task("SonarEnd")
   .Does(() => {
      SonarEnd(new SonarEndSettings{
         Login = sonarKey,
      });
 });
+
+Task("Test")
+    .IsDependentOn("JenkinsTest")
+    .IsDependentOn("VSTest")
+    .IsDependentOn("TeamCityTest");
 
 Task("Sonar")
     .IsDependentOn("Version")
