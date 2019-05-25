@@ -1,7 +1,7 @@
 #load "build/args.cake"
 #load "build/test.cake"
-#tool nuget:?package=GitVersion&version=3.6.5
-#tool nuget:?package=GitVersion.CommandLine&version=3.6.5
+#tool nuget:?package=GitVersion
+#tool nuget:?package=GitVersion.CommandLine
 
 Task("Clean")
     .Does(() =>
